@@ -23,4 +23,22 @@ class CompanyRepository extends BaseRepository implements CompanyRepositoryInter
         parent::__construct($company);
     }
 
+    /**
+     * @param int $company_id
+     * @return array
+     */
+    public function getChildrenIds(int $company_id): array
+    {
+        $company = $this->model->find($company_id);
+        $ids = [$company->id];
+
+        if ($company->children()->count()) {
+            foreach ($company->children()->get() as $child) {
+                $ids = array_merge($ids, $this->getChildrenIds($child->id));
+            }
+            return array_unique($ids);
+        } else {
+            return array_unique($ids);
+        }
+    }
 }

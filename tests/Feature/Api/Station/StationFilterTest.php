@@ -70,4 +70,32 @@ class StationFilterTest extends TestCase
             ]);
     }
 
+    /** @test */
+    public function it_returns_stations_which_belongs_to_a_nested_company()
+    {
+        $company = factory(Company::class)->create();
+        $station = factory(Station::class)->create(['company_id'=>$company->id]);
+
+        $company2 = factory(Company::class)->create(['parent_company_id'=>$company->id]);
+        $station2 = factory(Station::class)->create(['company_id'=>$company2->id]);
+
+
+        $response = $this->getJson('/api/stations?nested_company_id_stations='.$company->id);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'stations' => [
+                    [
+                        'id' => $station2->id,
+                        'name' => $station2->name,
+                    ],
+                    [
+                        'id' => $station->id,
+                        'name' => $station->name,
+                    ],
+                ],
+                'stationsCount' => 2
+            ]);
+    }
+
 }

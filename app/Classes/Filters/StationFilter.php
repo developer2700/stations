@@ -2,10 +2,30 @@
 
 namespace App\Classes\Filters;
 
+use App\Classes\Transformers\StationTransformer;
 use App\Models\Station;
+use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Repositories\Interfaces\StationRepositoryInterface;
+use Illuminate\Http\Request;
+
 
 class StationFilter extends Filter
 {
+
+    protected $companyRepository;
+
+    /**
+     * Filter constructor.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param CompanyRepositoryInterface $companyRepository
+     */
+    public function __construct(Request $request, CompanyRepositoryInterface $companyRepository)
+    {
+        parent::__construct($request);
+        $this->companyRepository = $companyRepository;
+    }
+
     /**
      * Filter by name
      * Get all the stations by the given name.
@@ -15,7 +35,7 @@ class StationFilter extends Filter
      */
     protected function name($name)
     {
-        return $this->builder->where('name','like',$name.'%');
+        return $this->builder->where('name', 'like', $name . '%');
     }
 
     /**
@@ -39,7 +59,20 @@ class StationFilter extends Filter
      */
     protected function company_id($id)
     {
-        return $this->builder->where('company_id',$id);
+        return $this->builder->where('company_id', $id);
+    }
+
+    /**
+     * Filter by nested_company_id_stations
+     * Get all stations by the given company_id and it's children.
+     *
+     * @param $id
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function nested_company_id_stations($id)
+    {
+        $ids = $this->companyRepository->getChildrenIds($id);
+        return $this->builder->whereIn('company_id', $ids);
     }
 
 }
