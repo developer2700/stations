@@ -5,6 +5,8 @@ namespace App\Classes\Filters;
 use ReflectionClass;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use ReflectionFunction;
+use ReflectionMethod;
 
 abstract class Filter implements FilterInterface
 {
@@ -35,9 +37,9 @@ abstract class Filter implements FilterInterface
      */
     protected function getFilterMethods()
     {
-        $class  = new ReflectionClass(static::class);
+        $class = new ReflectionClass(static::class);
 
-        $methods = array_map(function($method) use ($class) {
+        $methods = array_map(function ($method) use ($class) {
             if ($method->class === $class->getName()) {
                 return $method->name;
             }
@@ -66,11 +68,16 @@ abstract class Filter implements FilterInterface
     public function apply(Builder $builder)
     {
         $this->builder = $builder;
-
         foreach ($this->getFilters() as $name => $value) {
+
             if (method_exists($this, $name)) {
                 if ($value) {
-                    $this->$name($value);
+                    $params = $this->get_params($name);
+                    if ($params && count($params) > 1) {
+                        $this->$name(...array_values($this->request->only($params)));
+                    } else {
+                        $this->$name($value);
+                    }
                 } else {
                     $this->$name();
                 }
@@ -79,4 +86,16 @@ abstract class Filter implements FilterInterface
 
         return $this->builder;
     }
+
+    public function get_params($method_name)
+    {
+        $reflection = new ReflectionMethod(static::class, $method_name);
+        $params = $reflection->getParameters();
+        $paramNames = array_map(function ($item) {
+            return $item->getName();
+        }, $params);
+        return $paramNames;
+    }
+
+
 }
