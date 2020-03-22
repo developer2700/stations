@@ -47,10 +47,17 @@ class CompanyCreateTest extends TestCase
             ]);
     }
 
+    // we won't use use login in this project
     /** @test */
 //    public function it_returns_an_unauthorized_error_when_trying_to_add_company_without_logging_in()
 //    {
-//        $response = $this->postJson('/api/companies', []);
+//        $data = [
+//            'company' => [
+//                'name' => 'company 1',
+//            ]
+//        ];
+//
+//        $response = $this->postJson('/api/companies', $data, []);
 //
 //        $response->assertStatus(401);
 //    }

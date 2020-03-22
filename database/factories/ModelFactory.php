@@ -36,3 +36,5 @@ $factory->define(\App\Models\Company::class, function (\Faker\Generator $faker) 
     ];
 });
 
+
+

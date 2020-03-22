@@ -26,6 +26,9 @@ class CompanyController extends ApiController
         $this->repository = $companyRepository;
         $this->transformer = $transformer;
 
+        // this is for jwt auth and we won't use it in this project
+//        $this->middleware('auth.api')->except(['index', 'show']);
+//        $this->middleware('auth.api:optional')->only(['index', 'show']);
     }
 
     /**
