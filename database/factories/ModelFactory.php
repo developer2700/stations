@@ -5,7 +5,7 @@
 use App\Models\User;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
-
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 /*
 |--------------------------------------------------------------------------
 | Model Factories
@@ -36,5 +36,27 @@ $factory->define(\App\Models\Company::class, function (\Faker\Generator $faker) 
     ];
 });
 
+$factory->define(App\Models\Station::class, function (\Faker\Generator $faker) {
+    static $reduce = 999;
+    return [
+        'name' => $faker->streetName,
+        'created_at' => \Carbon\Carbon::now()->subSeconds($reduce--),
+        'location' => new Point(
+            $faker->randomFloat(6, 35.170106, 35.655129),
+            $faker->randomFloat(6, 51.116461, 51.389839)
+        ),
+    ];
+});
 
+$factory->state(App\Models\Station::class, 'with-company',  function (\Faker\Generator $faker) {
 
+    return [
+        'name' => $faker->streetName,
+        'created_at' => \Carbon\Carbon::now(),
+        'location' => new Point(
+            $faker->randomFloat(6, 35.170106, 35.655129),
+            $faker->randomFloat(6, 51.116461, 51.389839)
+        ),
+        'company_id' => factory(\App\Models\Company::class)->create()->id,
+    ];
+});

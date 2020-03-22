@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 Route::group(['namespace' => 'Api'], function () {
 
     Route::apiResource('companies', 'CompanyController');
+    Route::apiResource('stations', 'StationController');
 
     // we won't use these in this project
     Route::post('users/login', 'AuthController@login');
