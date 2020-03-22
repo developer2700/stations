@@ -6,7 +6,9 @@ use App\Classes\Transformers\StationTransformer;
 use App\Models\Station;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\StationRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 
 class StationFilter extends Filter
@@ -73,6 +75,21 @@ class StationFilter extends Filter
     {
         $ids = $this->companyRepository->getChildrenIds($id);
         return $this->builder->whereIn('company_id', $ids);
+    }
+
+    /**
+     * Filter by locations
+     * Get all stations which are close to given location by distance given radius.
+     *
+     * @param $latitude
+     * @param $longitude
+     * @param $radius
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function close_radius($latitude, $longitude, $radius = 25)
+    {
+        $location = new Point($latitude, $longitude);
+        return $this->builder->distanceSphere('location',$location,$radius);
     }
 
 }

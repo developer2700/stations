@@ -58,5 +58,4 @@ class Station extends Model
 
     }
 
-
 }

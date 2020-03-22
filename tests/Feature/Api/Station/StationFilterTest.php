@@ -6,6 +6,7 @@ use App\Models\Station;
 use App\Models\Company;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 class StationFilterTest extends TestCase
 {
@@ -93,6 +94,49 @@ class StationFilterTest extends TestCase
                         'id' => $station->id,
                         'name' => $station->name,
                     ],
+                ],
+                'stationsCount' => 2
+            ]);
+    }
+
+    /** @test */
+    public function it_returns_stations_which_are_close_to_given_locations_by_radius_distance()
+    {
+        //Kassisaba and  Kalamaja are 2.5km far
+        $Kassisaba =['latitude'=>59.432357,'longitude'=> 24.726164];
+        $Kalamaja =['latitude'=>59.450142,'longitude'=> 24.737538];
+        //6km
+        $Pae =['latitude'=>59.436050,'longitude'=> 24.8215618];
+
+        $station1 = factory(Station::class)->create([
+            'name' => 'Kassisaba in Estonia',
+            'location' => new Point($Kassisaba['latitude'], $Kassisaba['longitude']),
+        ]);
+        $station2 = factory(Station::class)->create([
+            'name' => 'Kalamaja in Estonia',
+            'location' => new Point($Kalamaja['latitude'], $Kalamaja['longitude'])
+        ]);
+        $station3 = factory(Station::class)->create([
+            'name' => 'Pae in Estonia',
+            'location' => new Point($Pae['latitude'], $Pae['longitude'])
+        ]);
+
+        $query_string="&latitude={$Kassisaba['latitude']}&longitude={$Kassisaba['longitude']}&radius=2500";
+        $response = $this->getJson("/api/stations?close_radius=1{$query_string}");
+
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'stations' => [
+                    [
+                        'id' => $station2->id,
+                        'name' => $station2->name,
+                    ],
+                    [
+                        'id' => $station1->id,
+                        'name' => $station1->name,
+                    ],
+
                 ],
                 'stationsCount' => 2
             ]);
