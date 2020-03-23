@@ -26,9 +26,6 @@ class StationController extends ApiController
         $this->repository = $stationRepository;
         $this->transformer = $transformer;
 
-        // we won't use auth login user in this project
-//        $this->middleware('auth.api')->except(['index', 'show']);
-//        $this->middleware('auth.api:optional')->only(['index', 'show']);
     }
 
     /**
@@ -49,6 +46,7 @@ class StationController extends ApiController
      *
      * @param CreateStation $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function store(CreateStation $request)
     {
@@ -62,11 +60,10 @@ class StationController extends ApiController
      *
      * @param Station $station
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function show(Station $station)
     {
-        $station = $this->repository->find($station->id);
-
         return $this->respondWithTransformer($station);
     }
 

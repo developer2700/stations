@@ -90,7 +90,7 @@ Run the database seeder and you're done
 
 ## Folders
 
-- `app` - Contains all the Eloquent models
+- `app/Models` - Contains all the Eloquent models
 - `app/Http/Controllers/Api` - Contains all the api controllers
 - `app/Http/Repositories` - Repository and interfaces
 - `app/Http/Middleware` - Contains the JWT auth middleware (not used in this version)

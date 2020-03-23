@@ -66,8 +66,6 @@ class CompanyController extends ApiController
      */
     public function show(Company $company)
     {
-        $company = $this->repository->find($company->id);
-
         return $this->respondWithTransformer($company);
     }
 
